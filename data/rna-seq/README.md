@@ -1,6 +1,6 @@
-RNA-seq data for space project
+# RNA-seq data for space project
 
-**Columns**
+### Columns
 
 In the file GLDS-48_rna_seq_Normalized_Counts.csv, each column
 represents one sample, in our case, one mouse is one sample. We are
@@ -31,7 +31,7 @@ ignored.
   Mmus_C57-6J_LVR_FLT_C_Rep5_M30      Space flight
   -----------------------------------------------------------------------
 
-**Rows**
+### Rows
 
 Each row in the file represents one gene. The first column contains the
 Ensembl gene IDs for these genes. If you want to know more about a gene.
@@ -44,7 +44,7 @@ Using the Ensembl database I learn that the gene ENSMUSG00000000441
 which is present in our file is also called Raf1, or v-raf-leukemia
 viral oncogene 1.
 
-**What does the numbers in the file actually mean?**
+### What does the numbers in the file actually mean?
 
 This file contains normalised counts. What does that mean?
 
@@ -79,7 +79,7 @@ per kilobase of exon per million reads mapped). What does that mean? It
 doesn\'t matter. High number means that the gene is activated a lot, low
 number means it\'s less activated.
 
-**So what are we using for our analysis?**
+### So what are we using for our analysis?
 
 Since we have multiple samples (5 from each environment), we might just
 want to add all the samples into one and take the average for each gene,
