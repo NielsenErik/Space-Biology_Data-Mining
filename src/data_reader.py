@@ -99,6 +99,7 @@ class Translator_Gene_Protein():
         if self._df is None:
             return 'No dataframe'
         for i in list_df:
+            print(i.columns)
             if 'ensembl_id' in i.columns:
                 df = pd.merge(self._df, i, on='ensembl_id', how='outer')
             elif 'Accession' in i.columns:
