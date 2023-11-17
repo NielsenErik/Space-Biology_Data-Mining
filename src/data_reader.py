@@ -88,8 +88,20 @@ class TranslatorConcat():
 
 
 if __name__ == '__main__':
-    print(os.getcwd())
-    dir = 'data/translator_mapping'
-    concat_df = TranslatorConcat(dir)
-    concat_df = concat_df.start_concatenator()
-    save_df = concat_df.to_csv('data/translator_mapping.csv', index=False)
+    # print(os.getcwd())
+    # dir = 'data/translator_mapping'
+    # concat_df = TranslatorConcat(dir)
+    # concat_df = concat_df.start_concatenator()
+    # save_df = concat_df.to_csv('data/translator_mapping.csv', index=False)
+    
+    prot_df = pd.read_csv('data/proteins/150929_KChatacharty_NASA_GeneLab_GroupA_CASIS_1_9_Fr1_TargetProtein.csv')
+    translator = pd.read_csv('data/translator_mapping.csv')
+    prot_list = prot_df['Accession'].tolist()
+    translator_list = translator['uniprot_id'].tolist()
+    
+    count = 0
+    for prot in prot_list:
+        if prot in translator_list:
+            count += 1
+            
+    print("Number of proteins in translator: ", count)
