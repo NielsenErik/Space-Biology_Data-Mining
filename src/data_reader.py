@@ -110,6 +110,10 @@ class Translator_Gene_Protein():
 if __name__ == '__main__':
     # print(os.getcwd())
     dir = 'data'
+    gb = pd.read_excel('data/proteins/NASA_GroupB_GC.xlsx')
+    gc = pd.read_excel('data/proteins/NASA_GroupC_FLT.xlsx')
+        
+    
     translator = pd.read_csv('data/translator_mapping.csv')
     concat_df = Translator_Gene_Protein(dir, df=translator)
     # concat_df = concat_df.start_concatenator()
@@ -118,6 +122,25 @@ if __name__ == '__main__':
     prot_df = pd.read_csv('data/proteins/150929_KChatacharty_NASA_GeneLab_GroupA_CASIS_1_9_Fr1_TargetProtein.csv')
 
     rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
+    
+    
+    gc_cols = []
+    flt_cols = []
+    # compute mean of GC and FLT
+    for col in rna_df.columns:
+        if 'GC' in col:
+            gc_cols.append(col)
+        elif 'FLT' in col:
+            flt_cols.append(col)
+            
+    rna_df['GC_mean'] = rna_df[gc_cols].mean(axis=1)
+    rna_df['GC_std'] = rna_df[gc_cols].std(axis=1)
+    rna_df['FLT_mean'] = rna_df[flt_cols].mean(axis=1)
+    rna_df['FLT_std'] = rna_df[flt_cols].std(axis=1)
+    
+    save_rna = rna_df.to_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts_with_means.csv', index=False)
+    
+    
     df_list = [rna_df, translator, prot_df]
     merger = Translator_Gene_Protein(dir, translator)
     
