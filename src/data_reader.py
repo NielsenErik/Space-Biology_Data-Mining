@@ -89,46 +89,41 @@ class Translator_Gene_Protein():
         if self._df is None:
             return 'No dataframe'
         count = 0
-        self._df['uniprot_id'] = self._df['uniprot_id'].astype(str)
+        self._df['Accession'] = self._df['Accession'].astype(str)
         for item in compare_list:
-            if item in self._df['uniprot_id'].tolist():
+            if item in self._df['Accession'].tolist():
                 count += 1
         return count
     
     def translations_merger(self, list_df):
-        if self._df is None:
-            return 'No dataframe'
-        for i in list_df:
-            print(i.columns)
-            if 'ensembl_id' in i.columns:
-                df = pd.merge(self._df, i, on='ensembl_id', how='outer')
-            elif 'Accession' in i.columns:
-                df = pd.merge(self._df, i, on='Accession', how='outer')
-            else:
-                print('No common column')
+        
+        df = list_df[1]
+        df['ensembl_id'] = df['ensembl_id'].astype(str).str.split('.').str[0]
+        print(df.head())
+        df = pd.merge(df, list_df[0], on='ensembl_id', how='left')
+        df = pd.merge(df, list_df[2], on='Accession', how='inner')
+        
         return df
         
 
 
 if __name__ == '__main__':
     # print(os.getcwd())
-    dir = 'data/translator_mapping'
-    concat_df = Translator_Gene_Protein(dir)
+    dir = 'data'
+    translator = pd.read_csv('data/translator_mapping.csv')
+    concat_df = Translator_Gene_Protein(dir, df=translator)
     # concat_df = concat_df.start_concatenator()
     # save_df = concat_df.to_csv('data/translator_mapping.csv', index=False)
     
     prot_df = pd.read_csv('data/proteins/150929_KChatacharty_NASA_GeneLab_GroupA_CASIS_1_9_Fr1_TargetProtein.csv')
+
     rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
-    translator = pd.read_csv('data/translator_mapping.csv')
-    prot_list = prot_df['Accession'].tolist()
-    
-    df_list = [prot_df, rna_df]
-    
+    df_list = [rna_df, translator, prot_df]
     merger = Translator_Gene_Protein(dir, translator)
     
     merged_df = merger.translations_merger(df_list)
     save_translator = merged_df.to_csv('data/merged_data.csv', index=False)
-    
+    prot_list = prot_df['Accession'].tolist()
     count = concat_df.translations_counter(prot_list)
             
     print("Number of proteins in translator: ", count)
