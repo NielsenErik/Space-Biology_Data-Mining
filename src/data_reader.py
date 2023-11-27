@@ -102,6 +102,7 @@ class Translator_Gene_Protein():
         print(df.head())
         df = pd.merge(df, list_df[0], on='ensembl_id', how='left')
         df = pd.merge(df, list_df[2], on='Accession', how='inner')
+        df = pd.merge(df, list_df[3], on='Accession', how='inner')
         
         return df
         
@@ -133,6 +134,16 @@ if __name__ == '__main__':
         elif 'FLT' in col:
             flt_cols.append(col)
             
+    for row in rna_df[gc_cols].iterrows():
+        for t in range(len(row)):
+            if row[t] == 0:
+                t = row.quantile(q=0.75)
+    for row in rna_df[gc_cols].iterrows():
+        for t in row:
+            if t == 0:
+                t = row.quantile(q=0.75)
+    
+            
     rna_df['GC_mean'] = rna_df[gc_cols].mean(axis=1)
     rna_df['GC_std'] = rna_df[gc_cols].std(axis=1)
     rna_df['FLT_mean'] = rna_df[flt_cols].mean(axis=1)
@@ -141,7 +152,7 @@ if __name__ == '__main__':
     save_rna = rna_df.to_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts_with_means.csv', index=False)
     
     
-    df_list = [rna_df, translator, prot_df]
+    df_list = [rna_df, translator, gb, gc]
     merger = Translator_Gene_Protein(dir, translator)
     
     merged_df = merger.translations_merger(df_list)
