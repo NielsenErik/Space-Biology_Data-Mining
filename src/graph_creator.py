@@ -10,7 +10,9 @@ class BioGraph():
         self._G = nx.Graph()
         self._gene_list = gene_list
         self._file_list = file_list
-        
+        self._node_counter = 0
+        self._attributes = {}
+    
     def set_gene_and_connections(self, df_list_index):
         file = self._file_list[df_list_index]
         gene_name = str(file.split('@')[1].split('.')[0])
@@ -18,12 +20,16 @@ class BioGraph():
         gene_connections = gene_df[['Frel','gene_name']]
         gene_connections = gene_connections[gene_connections['Frel'] > 0.5]
         gene_connections = gene_connections.to_numpy()
-        
-        self.add_gene(gene_name)
-        for gene, weight in gene_connections:
-            print(gene, weight)
-            self.add_gene(gene)
-            self.add_gene_link(gene_name, gene, weight)
+        gene_root = self._node_counter
+        self.add_gene(gene_root)
+        self._attributes[gene_root]= {'name': gene_name, 'node_position': gene_root}
+        self._node_counter += 1
+        for weight, gene in gene_connections:
+            self.add_gene(self._node_counter)
+            self._attributes[self._node_counter]={'name': gene, 'node_position': self._node_counter}
+            self.add_gene_link(gene_root, self._node_counter, weight)
+            self._node_counter += 1
+        nx.set_node_attributes(self._G, self._attributes)
         print(f"Finished to add {gene_name} and its connections")
         
     def add_gene(self, gene):
@@ -36,10 +42,11 @@ class BioGraph():
         return self._G
     
     def plot_graph(self):
+        pos=nx.spring_layout(self._G)
         subax1 = plt.subplot(121)
-        nx.draw(self._G, with_labels=True, font_weight='bold')
-        subax2 = plt.subplot(122)
-        nx.draw_shell(self._G, nlist=[range(5, 10), range(5)], with_labels=True, font_weight='bold')
+        nx.draw(self._G, pos, with_labels=True, font_weight='bold')
+        # subax2 = plt.subplot(122)
+        # nx.draw_networkx_edges(self._G, pos=nx.circular_layout(self._G))
         plt.show()
         
     def analyxe_graph(self):
@@ -47,7 +54,6 @@ class BioGraph():
         list(nx.connected_components(self._G))
         sorted(d for n, d in self._G.degree())
         cluster = nx.clustering(self._G)
-        print(cluster)
         
         
     def __quick_test__(self, df):
