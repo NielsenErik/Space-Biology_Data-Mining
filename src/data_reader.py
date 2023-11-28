@@ -106,6 +106,36 @@ class Translator_Gene_Protein():
         
         return df
         
+    class Label_Transaltor():
+        def __init__(self, list_df, mapper_path) -> None:
+            self._list_df = list_df
+            self._mapper = self.get_mapper(mapper_path)
+        
+        def get_mapper(self, mapper_path):
+            mapper = pd.read_csv(mapper_path)
+            mapper = mapper[['Sample Name', 'Label']]
+            return mapper
+          
+        def from_tmt_to_label(self, df):
+            for col in df.columns:
+                col_ = col.split(' ')[-1]
+                if col_ in self._mapper['Sample Name'].tolist():
+                    label = self._mapper.loc[self._mapper['Sample Name'] == col_]['Label'].values[0]
+                    df.rename(col, label)  
+            return df
+        
+        def label_df_list(self):
+            df_list = []
+            for df in self._list_df:
+                df_list.append(self.from_tmt_to_label(df))
+            return df_list
+        
+        def save_dfs(self):
+            df_list = self.label_df_list()
+            for df in df_list:
+                df.to_csv(f'data/proteins/test.csv', index=False)
+            return 0
+            
 
 
 if __name__ == '__main__':
@@ -113,8 +143,10 @@ if __name__ == '__main__':
     proton_dir = 'data/proteins/ProtonDiscoverer'
     list_files = os.listdir(proton_dir)
     dir = 'data'
-    gb = pd.read_excel('data/proteins/NASA_GroupB_GC.xlsx')
-    gc = pd.read_excel('data/proteins/NASA_GroupC_FLT.xlsx')
+    gb = pd.read_excel('data/proteins/ProtonDiscoverer/Group_B-1_PROT.csv')
+    gc = pd.read_excel('data/proteins/ProtonDiscoverer/Group_B-2_PROT.csv')
+    
+    dfs = [gb, gc]
         
     
     translator = pd.read_csv('data/translator_mapping.csv')
