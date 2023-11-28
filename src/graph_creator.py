@@ -18,7 +18,7 @@ class BioGraph():
         gene_name = str(file.split('@')[1].split('.')[0])
         gene_df = pd.read_csv(f'data/FantomV/test/{file}',  header= 1, index_col=0)
         gene_connections = gene_df[['Frel','gene_name']]
-        gene_connections = gene_connections[gene_connections['Frel'] > 0.99]
+        gene_connections = gene_connections[gene_connections['Frel'] > 0.995]
         gene_connections = gene_connections.to_numpy()
         self.add_gene(gene_name)
         for weight, gene in gene_connections:
@@ -105,6 +105,6 @@ if __name__ == '__main__':
     file_list = os.listdir('data/FantomV/test/')
     test = BioGraph(file_list=file_list)
     test.set_all_genes_connections()
-    test.approximize_graph()
+    # test.approximize_graph()
     test.plot_graph()
     

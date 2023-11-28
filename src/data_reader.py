@@ -110,6 +110,8 @@ class Translator_Gene_Protein():
 
 if __name__ == '__main__':
     # print(os.getcwd())
+    proton_dir = 'data/proteins/ProtonDiscoverer'
+    list_files = os.listdir(proton_dir)
     dir = 'data'
     gb = pd.read_excel('data/proteins/NASA_GroupB_GC.xlsx')
     gc = pd.read_excel('data/proteins/NASA_GroupC_FLT.xlsx')
