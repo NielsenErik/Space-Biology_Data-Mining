@@ -127,19 +127,41 @@ class Label_Translator():
     
 
 class DataIntegrator():
-    def __init__(self, rna_df, prot_df, translator) -> None:
+    def __init__(self, rna_df, prot_df, mapper) -> None:
         self._rna_df = rna_df
         self._prot_df = prot_df
-        self._translator = translator
+        self._mapper = mapper
             
     def indidual_integration(self):
+        
+        for col in self._prot_df.columns.tolist():
+            name = col + '_prot'
+            if col != 'human_accession':
+                self._prot_df = self._prot_df.rename(columns = {col : name})
+        
+        for col in self._rna_df.columns.tolist():
+            name = col + '_rna'
+            if col != 'mouse_ensembl_gene_id':
+                self._rna_df = self._rna_df.rename(columns = {col : name})
+        
+        df = pd.merge(self._mapper, self._prot_df, on='human_accession', how='inner')
+        df = pd.merge(df, self._rna_df, on='mouse_ensembl_gene_id', how='inner')
+        
+        print(df.head())
+        print(df.shape)
+        
+        save_df = df.to_csv('data/integrated/integrated_data_1.csv', index=False)
+        
         pass
     
 if __name__ == '__main__':
     # print(os.getcwd())
-    human_df = pd.read_csv('data/translator_mapping_human_ensembl_uniprot.csv')
-    mouse_df = pd.read_csv('data/map_mouse_human.csv')
-    merged = pd.merge(human_df, mouse_df, on='human_ensembl_gene_id', how='outer')
+    mapper = pd.read_csv('data/mappers/mapper_human_mouse.csv')
+    rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
+    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_1.csv')
     
-    save = merged.to_csv('data/translator_mapping_human_mouse.csv', index=False)
+    integrator = DataIntegrator(rna_df, prot_df, mapper)
+    integrator.indidual_integration()
+    
+
     
