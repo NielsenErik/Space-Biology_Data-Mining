@@ -124,8 +124,17 @@ class Label_Translator():
             df.to_csv(f'data/proteins/ProtonDiscoverer/renamed_labels_Proto_{counter}.csv', index=False)
             counter += 1
         return 0
+    
 
-
+class DataIntegrator():
+    def __init__(self, rna_df, prot_df, translator) -> None:
+        self._rna_df = rna_df
+        self._prot_df = prot_df
+        self._translator = translator
+            
+    def indidual_integration(self):
+        pass
+    
 if __name__ == '__main__':
     # print(os.getcwd())
     human_df = pd.read_csv('data/translator_mapping_human_ensembl_uniprot.csv')
