@@ -131,8 +131,9 @@ class DataIntegrator():
         self._rna_df = rna_df
         self._prot_df = prot_df
         self._mapper = mapper
+        self._integrated_df = None
             
-    def indidual_integration(self):
+    def df_integration(self):
         
         for col in self._prot_df.columns.tolist():
             name = col + '_prot'
@@ -151,7 +152,9 @@ class DataIntegrator():
         print(df.shape)
         
         save_df = df.to_csv('data/integrated/integrated_data_1.csv', index=False)
+        self._integrated_df = df
         
+    def individuals_integration(self):
         pass
     
 if __name__ == '__main__':
@@ -161,7 +164,7 @@ if __name__ == '__main__':
     prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_1.csv')
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)
-    integrator.indidual_integration()
+    integrator.df_integration()
     
 
     
