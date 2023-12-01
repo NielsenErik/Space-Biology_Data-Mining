@@ -103,10 +103,15 @@ class Label_Translator():
         return mapper
         
     def from_tmt_to_label(self, df):
+        print(self._mapper)
         for col in df.columns:
             col_ = col.split(' ')[-1]
-            for label, sample in zip(self._mapper['Label'], self._mapper['Sample Name']):
+            for row in self._mapper.iterrows():
+                label = row[1]['Label']
+                sample = row[1]['Sample Name']
+                # print(col_, label, sample)
                 if col_ == label:
+                    print(col_, label, sample)
                     df = df.rename(columns={col: sample})
         return df
     
@@ -119,7 +124,7 @@ class Label_Translator():
     
     def save_dfs(self):
         df_list = self.label_df_list()
-        counter =0
+        counter = 0
         for df in df_list:
             df.to_csv(f'data/proteins/ProtonDiscoverer/renamed_labels_Proto_{counter}.csv', index=False)
             counter += 1
@@ -155,16 +160,26 @@ class DataIntegrator():
         self._integrated_df = df
         
     def individuals_integration(self):
-        pass
+        for rna_col in self._rna_df.columns.tolist():
+            for prot_cols in self._prot_df.columns.tolist():
+                rna_col_ = rna_col.replace('_rna', '')
+                prot_cols_ = prot_cols.replace('_prot', '')
+                if rna_col_ == prot_cols_:
+                    print(rna_col, prot_cols)
+                    df = pd.DataFrame(self._integrated_df[['human_ensembl_gene_id','human_accession','mouse_ensembl_gene_id',rna_col, prot_cols]])
+                    print(df.head())
+                    print(df.shape)
+                    save_df = df.to_csv(f'data/integrated/integrated_data_{rna_col_}_0.csv', index=False)
     
 if __name__ == '__main__':
     # print(os.getcwd())
     mapper = pd.read_csv('data/mappers/mapper_human_mouse.csv')
     rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
-    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_1.csv')
+    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_0.csv')
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)
     integrator.df_integration()
+    integrator.individuals_integration()
     
 
     
