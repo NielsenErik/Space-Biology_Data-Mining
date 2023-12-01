@@ -7,6 +7,9 @@ from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
+import warnings
+warnings.filterwarnings('ignore')
+
 
 class DataAnalyzer():
     def __init__(self, df_gc_list, df_flt_list, gc_sample, flt_sample, gc_all = None, flt_all = None) -> None:
@@ -165,12 +168,17 @@ class DataAnalyzer():
         for cols in gc_df.columns.tolist():
             if 'Mmus_' in cols:
                 gc_df = gc_df.drop([cols], axis=1)
+        print(gc_df.columns.tolist())
+        print(flt_df.columns.tolist())
         for cols in flt_df.columns.tolist():
-            if 'Mmus_' in cols:
+            if '_FLT_' in cols:
                 flt_df = flt_df.drop([cols], axis=1)
+        print(flt_df.columns.tolist())
         
+        print("SAVING")
+        print(flt_df.head())
+        save = flt_df.to_csv('data/integrated/all_flt.csv', index=False)
         save_gc = gc_df.to_csv('data/integrated/all_gc.csv', index=False)
-        save_flt = flt_df.to_csv('data/integrated/all_flt.csv', index=False)
         
         self._gc_mean_df = gc_df
         self._flt_mean_df = flt_df
@@ -178,13 +186,21 @@ class DataAnalyzer():
         return gc_df, flt_df
     
     def analyze_means_exploration(self, gc_df, flt_df):
-        self._gc_mean_df = gc_df
-        self._flt_mean_df = flt_df
+        self._gc_mean_df, self._flt_mean_df = self.get_means_df()
         print("EXPLORATION")
         self._gc_mean_df = self.df_exploration(self._gc_mean_df, 'GC', all=True)
         self._flt_mean_df = self.df_exploration(self._flt_mean_df, 'FLT', all=True)
-        _ = self.get_cluster(self._gc_mean_df, sample='GC')
-        _ = self.get_cluster(self._flt_mean_df, sample='FLT')
+        self._gc_mean_df = self.get_cluster(self._gc_mean_df, sample='GC')
+        self._flt_mean_df = self.get_cluster(self._flt_mean_df, sample='FLT')
+        
+        save = self._gc_mean_df.to_csv('data/integrated/all_gc.csv', index=False)
+        save = self._flt_mean_df.to_csv('data/integrated/all_flt.csv', index=False)
+        
+    def get_ratios(self, df):
+        df['ratio'] = df['MEAN_prot'] / df['MEAN_rna']
+        sns.set_theme(style="whitegrid")
+        
+        return df
         
 if __name__ == '__main__':
     file_list = os.listdir('data/integrated/')
@@ -205,11 +221,12 @@ if __name__ == '__main__':
             file = file.replace('integrated_data_', '')
             file = file.replace('.csv', '')
             flt_sample.append(file)
-    gc_df = pd.read_csv('data/integrated/all_gc.csv')
-    flt_df = pd.read_csv('data/integrated/all_flt.csv')
+    # gc_df = pd.read_csv('data/integrated/all_gc.csv')
+    # flt_df = pd.read_csv('data/integrated/all_flt.csv')
     analyzer = DataAnalyzer(gc_file, flt_file, gc_sample, flt_sample)
+    analyzer.analyze_means_exploration(gc_df=None, flt_df=None)
     analyzer.df_list_exploration()
-    analyzer.analyze_means_exploration(gc_df=gc_df, flt_df=flt_df)
+    
     
     pass
         
