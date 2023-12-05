@@ -19,7 +19,7 @@ class BioGraph():
         gene_name = str(file.split('@')[1].split('.')[0])
         gene_df = pd.read_csv(f'data/FantomV/hs.FANTOM.annotated/{file}',  header= 1, index_col=0)
         gene_connections = gene_df[['Frel','gene_name']]
-        gene_connections = gene_connections[gene_connections['Frel'] > 0.995]
+        gene_connections = gene_connections[gene_connections['Frel'] > 0.9]
         gene_connections = gene_connections.to_numpy()
         self.add_gene(gene_name)
         for weight, gene in gene_connections:
@@ -73,18 +73,24 @@ class BioGraph():
             f.close()
         pos=nx.spring_layout(self._G)
         subax1 = plt.subplot(121)
+        plt.figure(figsize=(10,10))
         nx.draw(self._G, pos, with_labels=True)
         plt.title(f'Dependencies Graph of Genes on {self._cluster}')
+        
         plt.savefig(f"figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
         # subax2 = plt.subplot(122)
         # nx.draw_networkx_edges(self._G, pos=nx.circular_layout(self._G))
         plt.show()
+        plt.figure(figsize=(10,10))
         nx.draw_networkx_nodes(self._G, pos, node_size=700)
+        
         plt.title(f'Nodes representation of Genes {self._cluster}')
         plt.savefig(f"figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
         plt.show()
+        plt.figure(figsize=(10,10))
         nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=6)
         plt.title(f'Edges representation of dependencies between Genes on {self._cluster}')
+        
         plt.savefig(f"figures/graph/{self._cluster}/edges_graph_{self._cluster}.png")
         plt.show()
         
