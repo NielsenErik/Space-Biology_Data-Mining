@@ -290,6 +290,9 @@ class DataAnalyzer():
         return self._gc_df, self._flt_df
     
 if __name__ == '__main__':
+    
+    
+    
     df = pd.read_csv('data/integrated/integrated_data_all.csv')
     analyzer = DataAnalyzer(df)
     gc_df, flt_df = analyzer.run()

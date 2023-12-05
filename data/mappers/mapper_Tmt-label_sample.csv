@@ -1,0 +1,19 @@
+﻿Sample Name,Protocol REF,Label,MS Assay Name
+Mmus_C57-6J_LVR_VIV_C_Rep1_M16,Extraction,129N,TMT 11-plex
+Mmus_C57-6J_LVR_VIV_C_Rep2_M17,Extraction,129C,TMT 11-plex
+Mmus_C57-6J_LVR_VIV_C_Rep3_M18,Extraction,130N,TMT 11-plex
+Mmus_C57-6J_LVR_VIV_C_Rep4_M19,Extraction,130C,TMT 11-plex
+Mmus_C57-6J_LVR_VIV_C_Rep5_M20,Extraction,131N,TMT 11-plex
+Mmus_C57-6J_LVR_FLT_I_Rep1_M21,Extraction,Ftl 126,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_I_Rep2_M22,Extraction,Ftl 127N,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_C_Rep1_M25,Extraction,Ftl 127C,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_C_Rep2_M26,Extraction,Ftl 128N,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_C_Rep3_M27,Extraction,Ftl 128C,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_C_Rep4_M28,Extraction,Ftl 129N,TMT 10-plex
+Mmus_C57-6J_LVR_FLT_C_Rep5_M30,Extraction,Ftl 129C,TMT 10-plex
+Mmus_C57-6J_LVR_GC_I_Rep1_M31,Extraction,GC 126,TMT 10-plex
+Mmus_C57-6J_LVR_GC_I_Rep2_M32,Extraction,GC 127N,TMT 10-plex
+Mmus_C57-6J_LVR_GC_C_Rep1_M36,Extraction,GC 127C,TMT 10-plex
+Mmus_C57-6J_LVR_GC_C_Rep2_M37,Extraction,GC 128N,TMT 10-plex
+Mmus_C57-6J_LVR_GC_C_Rep3_M38,Extraction,GC 128C,TMT 10-plex
+Mmus_C57-6J_LVR_GC_C_Rep4_M39,Extraction,GC 129N,TMT 10-plex

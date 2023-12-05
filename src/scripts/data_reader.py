@@ -7,6 +7,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 import os
 from pybiomart import Server
+import math
 
 n_cores = multiprocessing.cpu_count()
 print(n_cores)
@@ -198,6 +199,11 @@ if __name__ == '__main__':
     mapper = pd.read_csv('data/mappers/mapper_human_mouse.csv')
     rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
     prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv')
+    
+    mask = [col for col in prot_df.columns if 'Mmus_' in col]
+    
+    prot_df[mask] = np.log(prot_df[mask])
+    save = prot_df.to_csv('data/proteins/ProtonDiscoverer/normalized_Proto_all_log.csv', index=False)
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)
     integrator.df_integration()
