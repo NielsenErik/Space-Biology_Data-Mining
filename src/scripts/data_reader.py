@@ -103,9 +103,12 @@ class Label_Translator():
         return mapper
         
     def from_tmt_to_label(self, df):
-        print(self._mapper)
+        print(df)
         for col in df.columns:
-            col_ = col.split(' ')[-1]
+            if len(col.split(' ')) > 1:
+                col_ =col.split(' ')[-2] + ' ' + col.split(' ')[-1]
+            else:
+                continue
             for row in self._mapper.iterrows():
                 label = row[1]['Label']
                 sample = row[1]['Sample Name']
@@ -126,7 +129,7 @@ class Label_Translator():
         df_list = self.label_df_list()
         counter = 0
         for df in df_list:
-            df.to_csv(f'data/proteins/ProtonDiscoverer/renamed_labels_Proto_{counter}.csv', index=False)
+            df.to_csv(f'data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv', index=False)
             counter += 1
         return 0
     
@@ -142,7 +145,7 @@ class DataIntegrator():
         
         for col in self._prot_df.columns.tolist():
             name = col + '_prot'
-            if col != 'human_accession':
+            if col != 'mouse_accession':
                 self._prot_df = self._prot_df.rename(columns = {col : name})
         
         for col in self._rna_df.columns.tolist():
@@ -150,13 +153,13 @@ class DataIntegrator():
             if col != 'mouse_ensembl_gene_id':
                 self._rna_df = self._rna_df.rename(columns = {col : name})
         
-        df = pd.merge(self._mapper, self._prot_df, on='human_accession', how='inner')
+        df = pd.merge(self._mapper, self._prot_df, on='mouse_accession', how='inner')
         df = pd.merge(df, self._rna_df, on='mouse_ensembl_gene_id', how='inner')
         
         print(df.head())
         print(df.shape)
         
-        save_df = df.to_csv('data/integrated/integrated_data_1.csv', index=False)
+        save_df = df.to_csv('data/integrated/integrated_data_all.csv', index=False)
         self._integrated_df = df
         
     def individuals_integration(self):
@@ -166,16 +169,35 @@ class DataIntegrator():
                 prot_cols_ = prot_cols.replace('_prot', '')
                 if rna_col_ == prot_cols_:
                     print(rna_col, prot_cols)
-                    df = pd.DataFrame(self._integrated_df[['human_ensembl_gene_id','human_accession','mouse_ensembl_gene_id',rna_col, prot_cols]])
+                    df = pd.DataFrame(self._integrated_df[['human_ensembl_gene_id','mouse_accession','mouse_ensembl_gene_id',rna_col, prot_cols]])
                     print(df.head())
                     print(df.shape)
                     save_df = df.to_csv(f'data/integrated/integrated_data_{rna_col_}_0.csv', index=False)
     
 if __name__ == '__main__':
+    
+    # prot1 = pd.read_csv('data/proteins/ProtonDiscoverer/GroupB_NASA_GC-vs-Flt_1PROT.csv')
+    # prot2 = pd.read_csv('data/proteins/ProtonDiscoverer/GroupB_NASA_GC-vs-Flt_2PROT.csv')
+    # prot = pd.concat([prot1, prot2])
+    # safe = prot.to_csv('data/proteins/ProtonDiscoverer/all_proteins_NASA_GC-vs-Flt.csv', index=False)
+    
+    # prot = pd.read_csv('data/proteins/ProtonDiscoverer/proteins_unlabelled.csv')
+    # prot = [prot]
+    # print(prot[0].head())
+    
+    # labels = 'data/mappers/mapper_Tmt-label_sample.csv'
+    
+    
+    
+    # translator = Label_Translator(prot, labels)
+    # prot_df = translator.save_dfs()
+    
+    # exit()
+    
     # print(os.getcwd())
     mapper = pd.read_csv('data/mappers/mapper_human_mouse.csv')
     rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
-    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_0.csv')
+    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv')
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)
     integrator.df_integration()
