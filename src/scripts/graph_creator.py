@@ -62,7 +62,15 @@ class BioGraph():
         
         print(self._G.number_of_edges())
         print(self._G.number_of_nodes())
-        
+        with open(f"figures/graph/{self._cluster}/graph_info.txt", "w") as f:
+            f.write(f"Number of edges: {self._G.number_of_edges()}\n")
+            f.write(f"Number of nodes: {self._G.number_of_nodes()}\n")
+            f.write(f"Graph density: {nx.density(self._G)}\n")
+            f.write(f"Graph average clustering: {nx.average_clustering(self._G)}\n")
+            f.write(f"Graph average degree connectivity: {nx.average_degree_connectivity(self._G)}\n")
+            # f.write(f"Graph average node connectivity: {nx.average_node_connectivity(self._G)}\n")
+            # f.write(f"Graph average nearest neighbors degree: {nx.average_neighbor_degree(self._G)}\n")
+            f.close()
         pos=nx.spring_layout(self._G)
         subax1 = plt.subplot(121)
         nx.draw(self._G, pos, with_labels=True)
@@ -81,6 +89,7 @@ class BioGraph():
         plt.show()
         
     def analyxe_graph(self):
+        
         
         list(nx.connected_components(self._G))
         sorted(d for n, d in self._G.degree())
@@ -107,7 +116,7 @@ def get_list(file):
 
 if __name__ == '__main__':
     
-    file = 'data/FantomV/cluster_0.txt'
+    file = 'data/FantomV/cluster_4.txt'
     cluster = file.split('/')[-1].split('.')[0]
     print(cluster)
     gene_list = get_list(file)

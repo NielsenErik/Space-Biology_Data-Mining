@@ -214,7 +214,7 @@ if __name__ == '__main__':
         # plt.show()
         # plt.close()
         prot_df[cols] = prot_df[cols].apply(lambda x: math.log(x))
-        prot_df[cols] = prot_df[cols].apply(lambda x: (x-prot_df[cols].median())/prot_df[cols].std())
+        prot_df[cols] = prot_df[cols].apply(lambda x: (x-prot_df[cols].mean())/prot_df[cols].std())
         print(prot_df[cols].mean(), prot_df[cols].std())
         # sns.histplot(prot_df[cols])
         # plt.show()
