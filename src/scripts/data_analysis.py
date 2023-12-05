@@ -18,6 +18,8 @@ class DataAnalyzer():
         self._df = df
         self._gc_df = self.df_splitter()[0]
         self._flt_df = self.df_splitter()[1]
+        self._rna_df = None
+        self._prot_df = None
         self._rna_cols = []
     
     # human_ensembl_gene_id,human_accession,hgnc_symbol,mouse_ensembl_gene_id,external_gene_name,mouse_accession
@@ -26,8 +28,8 @@ class DataAnalyzer():
         flt_df = pd.DataFrame()
         gc_df['mouse_ensembl_gene_id'] = self._df['mouse_ensembl_gene_id']
         flt_df['mouse_ensembl_gene_id'] = self._df['mouse_ensembl_gene_id']
-        gc_df['external_gene_name'] = self._df['external_gene_name']
-        flt_df['external_gene_name'] = self._df['external_gene_name']
+        gc_df['hgnc_symbol'] = self._df['hgnc_symbol']
+        flt_df['hgnc_symbol'] = self._df['hgnc_symbol']
         gc_df['mouse_accession'] = self._df['mouse_accession']
         flt_df['mouse_accession'] = self._df['mouse_accession']
         
@@ -99,10 +101,10 @@ class DataAnalyzer():
         return df
     
     def student_t_test_on_rna_prot_means(self):
-        rna_gc = self._gc_df[['mouse_ensembl_gene_id', 'RNA-Seq', 'STD_rna']]
-        rna_flt = self._flt_df[['mouse_ensembl_gene_id', 'RNA-Seq', 'STD_rna']]
-        prot_gc = self._gc_df[['mouse_ensembl_gene_id', 'Proteomics', 'STD_prot']]
-        prot_flt = self._flt_df[['mouse_ensembl_gene_id', 'Proteomics', 'STD_prot']]
+        rna_gc = self._gc_df[['hgnc_symbol','mouse_ensembl_gene_id', 'RNA-Seq', 'STD_rna']]
+        rna_flt = self._flt_df[['hgnc_symbol','mouse_ensembl_gene_id', 'RNA-Seq', 'STD_rna']]
+        prot_gc = self._gc_df[['hgnc_symbol','mouse_ensembl_gene_id', 'Proteomics', 'STD_prot']]
+        prot_flt = self._flt_df[['hgnc_symbol','mouse_ensembl_gene_id', 'Proteomics', 'STD_prot']]
         
         rna_gc = rna_gc.rename(columns = {'RNA-Seq' : 'RNA-Seq_GC'})
         rna_gc = rna_gc.rename(columns = {'STD_rna' : 'STD_rna_GC'})
@@ -113,8 +115,8 @@ class DataAnalyzer():
         prot_flt = prot_flt.rename(columns = {'Proteomics' : 'Proteomics_FLT'})
         prot_flt = prot_flt.rename(columns = {'STD_prot' : 'STD_prot_FLT'})
         
-        rna_merge = pd.merge(rna_gc, rna_flt, on='mouse_ensembl_gene_id', how='inner')
-        prot_merge = pd.merge(prot_gc, prot_flt, on='mouse_ensembl_gene_id', how='inner')
+        rna_merge = pd.merge(rna_gc, rna_flt, on=['hgnc_symbol','mouse_ensembl_gene_id'], how='inner')
+        prot_merge = pd.merge(prot_gc, prot_flt, on=['hgnc_symbol','mouse_ensembl_gene_id'], how='inner')
         
         print(rna_merge.head())
         
@@ -156,9 +158,6 @@ class DataAnalyzer():
             col = 'prot-t-test-statistic'
         scaler = StandardScaler()
         df_ = scaler.fit_transform(df[[col]])
-        
-        kmeans = KMeans(n_clusters=2, random_state=0).fit(df_)
-        
         inertia = []
         silhouette = []
         for k in range(2, 10):
@@ -193,7 +192,7 @@ class DataAnalyzer():
         
         df_ = scaler.fit_transform(df_[[col]])
         
-        kmeans = KMeans(n_clusters=6, random_state=0).fit(df_)
+        kmeans = KMeans(n_clusters=5, random_state=0).fit(df_)
         df['cluster'] = kmeans.labels_
         
         
@@ -277,6 +276,20 @@ class DataAnalyzer():
         
         return rna_merge, prot_merge
     
+    def genes_picker(self, df):
+        for cluster in df['cluster_rna'].unique():
+            
+            cluster_df = df[df['cluster_rna'] == cluster]
+            tmp = cluster_df.sort_values(by=['rna-t-test-p-value'], ascending=False)
+            
+            with open(f'data/FantomV/cluster_{cluster}.txt', 'w') as f:
+                for row in range(10):
+                    if len(tmp)>row:
+                        f.write(tmp.iloc[row][0] + '\n')
+                    else:
+                        break
+            
+    
     def run(self):
         self._gc_df = self.compute_means(self._gc_df)
         self._flt_df = self.compute_means(self._flt_df)
@@ -285,7 +298,17 @@ class DataAnalyzer():
         self._flt_df = self.df_exploration(self._flt_df, 'FLT')
         
         self.student_t_test_on_rna_prot_means_on_all_samples()
-        self.student_t_test_on_rna_prot_means()
+        self._rna_df, self._prot_df = self.student_t_test_on_rna_prot_means()
+        
+        self._rna_df = self._rna_df.rename(columns = {'cluster' : 'cluster_rna'})
+        self._prot_df = self._prot_df.rename(columns = {'cluster' : 'cluster_prot'})
+        
+        merged_df = pd.merge(self._rna_df, self._prot_df, on=['hgnc_symbol','mouse_ensembl_gene_id'], how='inner')
+        
+        genes_pool = merged_df[merged_df['cluster_rna'] == merged_df['cluster_prot']]
+        print(genes_pool)
+        
+        self.genes_picker(genes_pool)
         
         return self._gc_df, self._flt_df
     

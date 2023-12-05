@@ -8,6 +8,10 @@ import multiprocessing
 import os
 from pybiomart import Server
 import math
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy.stats import boxcox
+from sklearn.preprocessing import quantile_transform
 
 n_cores = multiprocessing.cpu_count()
 print(n_cores)
@@ -202,7 +206,19 @@ if __name__ == '__main__':
     
     mask = [col for col in prot_df.columns if 'Mmus_' in col]
     
-    prot_df[mask] = np.log(prot_df[mask])
+    # apply log tranformation on protein data
+    
+    for cols in mask:
+        print(prot_df[cols].mean(), prot_df[cols].std())
+        # sns.histplot(prot_df[cols])
+        # plt.show()
+        # plt.close()
+        prot_df[cols] = prot_df[cols].apply(lambda x: math.log(x))
+        prot_df[cols] = prot_df[cols].apply(lambda x: (x-prot_df[cols].median())/prot_df[cols].std())
+        print(prot_df[cols].mean(), prot_df[cols].std())
+        # sns.histplot(prot_df[cols])
+        # plt.show()
+        # plt.close()
     save = prot_df.to_csv('data/proteins/ProtonDiscoverer/normalized_Proto_all_log.csv', index=False)
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)

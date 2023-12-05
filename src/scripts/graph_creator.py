@@ -6,17 +6,18 @@ import matplotlib.pyplot as plt
 
 
 class BioGraph():
-    def __init__(self, gene_list = None, file_list = None, gene_list_to_discover = None) -> None:
+    def __init__(self, gene_list = None, file_list = None, gene_list_to_discover = None, cluster = None) -> None:
         self._G = nx.Graph()
         self._aprox_G = nx.Graph()
         self._gene_list = gene_list
         self._file_list = file_list
         self._gene_to_discover = gene_list_to_discover
+        self._cluster = cluster
     
     def set_gene_and_connections(self, df_list_index):
         file = self._file_list[df_list_index]
         gene_name = str(file.split('@')[1].split('.')[0])
-        gene_df = pd.read_csv(f'data/FantomV/test/{file}',  header= 1, index_col=0)
+        gene_df = pd.read_csv(f'data/FantomV/hs.FANTOM.annotated/{file}',  header= 1, index_col=0)
         gene_connections = gene_df[['Frel','gene_name']]
         gene_connections = gene_connections[gene_connections['Frel'] > 0.995]
         gene_connections = gene_connections.to_numpy()
@@ -65,18 +66,18 @@ class BioGraph():
         pos=nx.spring_layout(self._G)
         subax1 = plt.subplot(121)
         nx.draw(self._G, pos, with_labels=True)
-        plt.title('Dependencies Graph of Genes')
-        plt.savefig("figures/graph/dependencies_graph.png")
+        plt.title(f'Dependencies Graph of Genes on {self._cluster}')
+        plt.savefig(f"figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
         # subax2 = plt.subplot(122)
         # nx.draw_networkx_edges(self._G, pos=nx.circular_layout(self._G))
         plt.show()
         nx.draw_networkx_nodes(self._G, pos, node_size=700)
-        plt.title('Nodes representation of Genes')
-        plt.savefig("figures/graph/nodes_graph.png")
+        plt.title(f'Nodes representation of Genes {self._cluster}')
+        plt.savefig(f"figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
         plt.show()
         nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=6)
-        plt.title('Edges representation of dependencies between Genes')
-        plt.savefig("figures/graph/edges_graph.png")
+        plt.title(f'Edges representation of dependencies between Genes on {self._cluster}')
+        plt.savefig(f"figures/graph/{self._cluster}/edges_graph_{self._cluster}.png")
         plt.show()
         
     def analyxe_graph(self):
@@ -98,12 +99,28 @@ class BioGraph():
     def __quick_test__(self, df):
         pass
         
-        
+
+def get_list(file):
+    gene_list = open(file, 'r')
+    return gene_list.read().split('\n')
         
 
 if __name__ == '__main__':
-    file_list = os.listdir('data/FantomV/test/')
-    test = BioGraph(file_list=file_list)
+    
+    file = 'data/FantomV/cluster_0.txt'
+    cluster = file.split('/')[-1].split('.')[0]
+    print(cluster)
+    gene_list = get_list(file)
+    print(gene_list)
+    
+    complete_file_list = os.listdir('data/FantomV/hs.FANTOM.annotated/')
+    
+    file_list = []
+    for f in complete_file_list:
+        if f.split('@')[1].split('.')[0] in gene_list:
+            file_list.append(f)
+    
+    test = BioGraph(file_list=file_list, cluster = cluster)
     test.set_all_genes_connections()
     # test.approximize_graph()
     test.plot_graph()
