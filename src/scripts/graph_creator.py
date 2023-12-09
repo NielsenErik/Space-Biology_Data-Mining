@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import os
 import matplotlib.pyplot as plt
+import time
 
 
 class BioGraph():
@@ -17,13 +18,15 @@ class BioGraph():
     def set_gene_and_connections(self, df_list_index):
         file = self._file_list[df_list_index]
         gene_name = str(file.split('@')[1].split('.')[0])
-        gene_df = pd.read_csv(f'data/FantomV/hs.FANTOM.annotated/{file}',  header= 1, index_col=0)
+        gene_df = pd.read_csv(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/hs.FANTOM.annotated/{file}',  header= 1, index_col=0)
         gene_connections = gene_df[['Frel','gene_name']]
-        gene_connections = gene_connections[gene_connections['Frel'] > 0.995]
+        gene_connections = gene_connections[gene_connections['Frel'] > 0.9]
         gene_connections = gene_connections.to_numpy()
         self.add_gene(gene_name)
         for weight, gene in gene_connections:
-            self.add_gene(gene)
+            mylist = self._gene_list
+        #    self.add_gene(gene)
+        #    if gene in self._gene_list:
             self.add_gene_link(gene_name, gene, weight)
         self._G.remove_edges_from(nx.selfloop_edges(self._G))
         print(f"Gene set {gene_name} added to graph")
@@ -62,7 +65,7 @@ class BioGraph():
         
         print(self._G.number_of_edges())
         print(self._G.number_of_nodes())
-        with open(f"figures/graph/{self._cluster}/graph_info.txt", "w") as f:
+        with open(f"C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/graph/{self._cluster}/graph_info.txt", "w") as f:
             f.write(f"Number of edges: {self._G.number_of_edges()}\n")
             f.write(f"Number of nodes: {self._G.number_of_nodes()}\n")
             f.write(f"Graph density: {nx.density(self._G)}\n")
@@ -71,21 +74,22 @@ class BioGraph():
             # f.write(f"Graph average node connectivity: {nx.average_node_connectivity(self._G)}\n")
             # f.write(f"Graph average nearest neighbors degree: {nx.average_neighbor_degree(self._G)}\n")
             f.close()
-        pos=nx.spring_layout(self._G)
+        pos=nx.spring_layout(self._G, k=2)
         subax1 = plt.subplot(121)
         nx.draw(self._G, pos, with_labels=True)
         plt.title(f'Dependencies Graph of Genes on {self._cluster}')
-        plt.savefig(f"figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
+        plt.savefig(f"C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
+        plt.close()
         # subax2 = plt.subplot(122)
         # nx.draw_networkx_edges(self._G, pos=nx.circular_layout(self._G))
-        plt.show()
-        nx.draw_networkx_nodes(self._G, pos, node_size=700)
-        plt.title(f'Nodes representation of Genes {self._cluster}')
-        plt.savefig(f"figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
-        plt.show()
-        nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=6)
+        # plt.show()
+        # nx.draw_networkx_nodes(self._G, pos, node_size=700)
+        # plt.title(f'Nodes representation of Genes {self._cluster}')
+        # plt.savefig(f"C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
+        # plt.show()
+        nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=2)
         plt.title(f'Edges representation of dependencies between Genes on {self._cluster}')
-        plt.savefig(f"figures/graph/{self._cluster}/edges_graph_{self._cluster}.png")
+        plt.savefig(f"C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/graph/{self._cluster}/edges_graph_{self._cluster}.png")
         plt.show()
         
     def analyxe_graph(self):
@@ -107,6 +111,26 @@ class BioGraph():
         
     def __quick_test__(self, df):
         pass
+
+    def make_graph(self, gene_list, file_dict):
+        self._G.add_nodes_from(gene_list)
+        for gene in gene_list:
+            try:
+                for file in file_dict[gene]:
+                    gene_df = pd.read_csv(
+                        f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/hs.FANTOM.annotated/{file}',
+                        header=1, index_col=0)
+                    gene_connections = gene_df[['Frel', 'gene_name']]
+                    gene_connections = gene_connections[gene_connections['Frel'] > 0.9]
+                    gene_connections = gene_connections.to_numpy()
+                    for weight, gene2 in gene_connections:
+                        if gene2 in gene_list and not gene == gene2:
+                            self.add_gene_link(gene, gene2, weight)
+            except KeyError:
+                # print(f'{gene} not in dataset')
+                pass
+
+
         
 
 def get_list(file):
@@ -116,21 +140,28 @@ def get_list(file):
 
 if __name__ == '__main__':
     
-    file = 'data/FantomV/cluster_4.txt'
+    file = 'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/cluster_3.txt'
     cluster = file.split('/')[-1].split('.')[0]
     print(cluster)
     gene_list = get_list(file)
     print(gene_list)
     
-    complete_file_list = os.listdir('data/FantomV/hs.FANTOM.annotated/')
+    complete_file_list = os.listdir('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/hs.FANTOM.annotated/')
     
-    file_list = []
+    file_dict = {}
     for f in complete_file_list:
-        if f.split('@')[1].split('.')[0] in gene_list:
-            file_list.append(f)
-    
-    test = BioGraph(file_list=file_list, cluster = cluster)
-    test.set_all_genes_connections()
+        curr=f.split('@')[1].split('.')[0]
+        if curr in gene_list:
+            if curr not in file_dict.keys():
+                file_dict[curr]=[f]
+            else:
+                file_dict[curr].append(f)
+
+    test = BioGraph(cluster = cluster)
+    tic = time.time()
+    test.make_graph(gene_list, file_dict)
+    toc = time.time()
+    print(toc-tic)
     # test.approximize_graph()
     test.plot_graph()
     
