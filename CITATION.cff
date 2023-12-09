@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Nielsen
+    given-names: Erik
+  - family-names: Sebek
+    given-names: Zacharina 
+  - family-names: Holmer
+    given-names: Ingmar 
+  - family-names: Xi
+    given-names: Han
+    
+title: "Space Biology Data Mining"
+version: 1.0.0
+date-released: 2023-06-13
+url: https://github.com/NielsenErik/Space-Biology_Data-Mining
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
