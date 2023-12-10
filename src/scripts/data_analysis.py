@@ -71,7 +71,7 @@ class DataAnalyzer():
         sns.set_theme(style="whitegrid")
         sns.heatmap(df.isnull(), cbar=False, cmap='viridis', xticklabels=False)
         plt.title(f'Missing values on sample\n{sample}')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/rna-prot_means/missing_values_{sample}.png')
+        plt.savefig(f'figures/plots/rna-prot_means/missing_values_{sample}.png')
         plt.close()
 
         df = df.replace([np.inf, -np.inf], np.nan)
@@ -87,7 +87,7 @@ class DataAnalyzer():
         # plt.title(f'Outliers on sample\n{sample}')
         # plt.xlabel('RNA-Seq')
         # plt.ylabel('Proteomics')
-        # plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/rna-prot_means/outliers_{sample}.png')
+        # plt.savefig(f'figures/plots/rna-prot_means/outliers_{sample}.png')
         # plt.close()
         #
         # df = df[df['outlier'] == 1]
@@ -97,7 +97,7 @@ class DataAnalyzer():
         plt.title(f'scatterplot sample\n{sample}')
         plt.xlabel('RNA-Seq')
         plt.ylabel('Proteomics')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/rna-prot_means/outliers_removed_{sample}.png')
+        plt.savefig(f'figures/plots/rna-prot_means/outliers_removed_{sample}.png')
         plt.close()
         
         # df = df.drop(['outlier'], axis=1)
@@ -134,8 +134,8 @@ class DataAnalyzer():
         self.cluster_analysis(rna_merge, 'RNA-Seq')
         self.cluster_analysis(prot_merge, 'Proteomics')
         
-        save = rna_merge.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/rna_means_t_test.csv', index=False)
-        save = prot_merge.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/prot_means_t_test.csv', index=False)
+        save = rna_merge.to_csv('data/processed/rna_means_t_test.csv', index=False)
+        save = prot_merge.to_csv('data/processed/prot_means_t_test.csv', index=False)
         return rna_merge, prot_merge
     
     def analyze_t_test(self, df, title):
@@ -147,11 +147,11 @@ class DataAnalyzer():
             cols = ['prot-t-test-statistic', 'prot-t-test-p-value']
         sns.histplot(x = cols[0], data=df)
         plt.title(f'{title} t-test statistic distribution')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/t-test/{title}_t-test_statistic_distribution.png')
+        plt.savefig(f'figures/plots/t-test/{title}_t-test_statistic_distribution.png')
         # plt.show()
         sns.histplot(x = cols[1], data=df)
         plt.title(f'{title} t-test p-value distribution')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/t-test/{title}_t-test_p-value_distribution.png')
+        plt.savefig(f'figures/plots/t-test/{title}_t-test_p-value_distribution.png')
         # plt.show()
     
     def cluster_eval(self, df, title):
@@ -176,7 +176,7 @@ class DataAnalyzer():
         ax[1].set_xlabel('Number of clusters')
         ax[1].set_ylabel('Silhouette score')
         ax[1].set_title(f'Silhouette score for {title}')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/clusters_analysis/{title}_cluster_eval_w_outliers.png')
+        plt.savefig(f'figures/plots/clusters_analysis/{title}_cluster_eval_w_outliers.png')
         # plt.show()
         plt.close()
     
@@ -204,7 +204,7 @@ class DataAnalyzer():
             plt.xscale('log')
             plt.yscale('log')
         plt.title(f'evaluating number of clusters')
-        plt.savefig(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/plots/clusters_analysis/{title}_clusters_w_outliers.png')
+        plt.savefig(f'figures/plots/clusters_analysis/{title}_clusters_w_outliers.png')
         # plt.show()
         plt.close()
 
@@ -276,8 +276,8 @@ class DataAnalyzer():
         prot_merge['t-test-statistic'] = prot_res[:, 0]
         prot_merge['t-test-p-value'] = prot_res[:, 1]
         
-        save = rna_merge.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/rna_t_test.csv', index=False)
-        save = prot_merge.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/prot_t_test.csv', index=False)
+        save = rna_merge.to_csv('data/processed/rna_t_test.csv', index=False)
+        save = prot_merge.to_csv('data/processed/prot_t_test.csv', index=False)
         
         return rna_merge, prot_merge
     
@@ -287,7 +287,7 @@ class DataAnalyzer():
             cluster_df = df[df['cluster_rna'] == cluster]
             tmp = df.sort_values(by=['rna-t-test-p-value'], ascending=False)
             
-            with open(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/cluster_{cluster}.txt', 'w') as f:
+            with open(f'data/FantomV/cluster_{cluster}.txt', 'w') as f:
                 for row in range(100):
                     if len(tmp)>row:
                         f.write(tmp.iloc[row][0] + '\n')
@@ -314,7 +314,7 @@ class DataAnalyzer():
                                ((merged_df['cluster_rna'] == 3) & (merged_df['cluster_prot'] == 2))]
         print(genes_pool)
 
-        # with open(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/outliers.txt',
+        # with open(f'data/FantomV/outliers.txt',
         #           'w') as f:
         #     for row in genes_pool.index:
         #         f.write(genes_pool['hgnc_symbol'][row] + '\n')
@@ -326,8 +326,8 @@ class DataAnalyzer():
 
 if __name__ == '__main__':
 
-    df = pd.read_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/integrated/integrated_data_all.csv')
+    df = pd.read_csv('data/integrated/integrated_data_all.csv')
     analyzer = DataAnalyzer(df)
     gc_df, flt_df = analyzer.run()
-    gc_df.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/gc_df.csv', index=False)
-    flt_df.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/processed/flt_df.csv', index=False)
+    gc_df.to_csv('data/processed/gc_df.csv', index=False)
+    flt_df.to_csv('data/processed/flt_df.csv', index=False)

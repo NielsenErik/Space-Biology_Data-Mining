@@ -9,14 +9,13 @@ edges = []
 densities = []
 clusterings = []
 
-df = pd.read_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/integrated/integrated_data_all.csv')
+df = pd.read_csv('data/integrated/integrated_data_all.csv')
 
 genes = df['hgnc_symbol'].tolist()
 for i in range(30):
     rand_genes = random.choices(genes, k=100)
 
-    complete_file_list = os.listdir(
-        'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/hs.FANTOM.annotated/')
+    complete_file_list = os.listdir('data/FantomV/hs.FANTOM.annotated/')
 
     file_dict = {}
     for f in complete_file_list:

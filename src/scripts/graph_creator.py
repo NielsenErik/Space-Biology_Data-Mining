@@ -83,6 +83,12 @@ class BioGraph():
         plt.savefig(f"figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
         # subax2 = plt.subplot(122)
         # nx.draw_networkx_edges(self._G, pos=nx.circular_layout(self._G))
+        # plt.show()
+        # nx.draw_networkx_nodes(self._G, pos, node_size=700)
+        # plt.title(f'Nodes representation of Genes {self._cluster}')
+        # plt.savefig(f"figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
+        # plt.show()
+        nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=2)
         plt.show()
         plt.figure(figsize=(10,10))
         nx.draw_networkx_nodes(self._G, pos, node_size=700)
@@ -95,7 +101,7 @@ class BioGraph():
         # plt.show()
         # nx.draw_networkx_nodes(self._G, pos, node_size=700)
         # plt.title(f'Nodes representation of Genes {self._cluster}')
-        # plt.savefig(f"C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
+        # plt.savefig(f"figures/graph/{self._cluster}/nodes_graph_{self._cluster}.png")
         # plt.show()
         nx.draw_networkx_edges(self._G, pos=pos, edgelist=self._G.edges(), width=2)
         plt.title(f'Edges representation of dependencies between Genes on {self._cluster}')
@@ -129,7 +135,7 @@ class BioGraph():
             try:
                 for file in file_dict[gene]:
                     gene_df = pd.read_csv(
-                        f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/FantomV/hs.FANTOM.annotated/{file}',
+                        f'data/FantomV/hs.FANTOM.annotated/{file}',
                         header=1, index_col=0)
                     gene_connections = gene_df[['Frel', 'gene_name']]
                     gene_connections = gene_connections[gene_connections['Frel'] > 0.9]
@@ -140,6 +146,9 @@ class BioGraph():
             except KeyError:
                 # print(f'{gene} not in dataset')
                 pass
+
+
+
 
 
 

@@ -36,7 +36,7 @@ class Translator():
         for i in range(0, splitter):
             sublist = gene_id_list[counter*i:counter*(i+1)]
             df = self.get_ensembl_mappings(sublist)
-            save = df.to_csv(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/translator_mapping/translator_mapping_human_ensembl_uniprot_{i}.csv', index=False)
+            save = df.to_csv(f'data/translator_mapping/translator_mapping_human_ensembl_uniprot_{i}.csv', index=False)
             
         # df = pd.concat(data)
         # save = df.to_csv('data/translator_mapping_human_ensembl_uniprot.csv', index=False)
@@ -52,7 +52,7 @@ class Translator():
         df = pd.concat(data)
         print(df.head())
         results = df[['ensembl_id', 'uniprot_id']]
-        results.to_csv(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/rna-seq/ensembl_uniprot_mapping_{id}.csv', index=False)
+        results.to_csv(f'data/rna-seq/ensembl_uniprot_mapping_{id}.csv', index=False)
         print(f'Finished {id}')
     
     def start_translator(self):
@@ -134,7 +134,7 @@ class Label_Translator():
         df_list = self.label_df_list()
         counter = 0
         for df in df_list:
-            df.to_csv(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv', index=False)
+            df.to_csv(f'data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv', index=False)
             counter += 1
         return 0
     
@@ -164,7 +164,7 @@ class DataIntegrator():
         print(df.head())
         print(df.shape)
         
-        save_df = df.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/integrated/integrated_data_all.csv', index=False)
+        save_df = df.to_csv('data/integrated/integrated_data_all.csv', index=False)
         self._integrated_df = df
         
     def individuals_integration(self):
@@ -177,7 +177,7 @@ class DataIntegrator():
                     df = pd.DataFrame(self._integrated_df[['human_ensembl_gene_id','mouse_accession','mouse_ensembl_gene_id',rna_col, prot_cols]])
                     print(df.head())
                     print(df.shape)
-                    save_df = df.to_csv(f'C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/integrated/integrated_data_{rna_col_}_0.csv', index=False)
+                    save_df = df.to_csv(f'data/integrated/integrated_data_{rna_col_}_0.csv', index=False)
     
 if __name__ == '__main__':
     
@@ -200,9 +200,9 @@ if __name__ == '__main__':
     # exit()
     
     # print(os.getcwd())
-    mapper = pd.read_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/mappers/mapper_human_mouse.csv')
-    rna_df = pd.read_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
-    prot_df = pd.read_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv')
+    mapper = pd.read_csv('data/mappers/mapper_human_mouse.csv')
+    rna_df = pd.read_csv('data/rna_seq/GLDS-48_rna_seq_Normalized_Counts.csv')
+    prot_df = pd.read_csv('data/proteins/ProtonDiscoverer/renamed_labels_Proto_all.csv')
     
     mask = [col for col in prot_df.columns if 'Mmus_' in col]
     
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     #     plt.show()
     #     plt.close()
 
-    save = prot_df.to_csv('C:/Users/ingma/PycharmProjects/Space-Biology_Data-Mining/data/proteins/ProtonDiscoverer/normalized_Proto_all_log.csv', index=False)
+    save = prot_df.to_csv('data/proteins/ProtonDiscoverer/normalized_Proto_all_log.csv', index=False)
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)
     integrator.df_integration()
