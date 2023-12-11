@@ -74,7 +74,7 @@ class BioGraph():
         pos=nx.spring_layout(self._G)
         subax1 = plt.subplot(121)
         plt.figure(figsize=(10,10))
-        nx.draw(self._G, pos, with_labels=True)
+        nx.draw_networkx(self._G, pos, with_labels=True)
         plt.title(f'Dependencies Graph of Genes on {self._cluster}')
         
         plt.savefig(f"figures/graph/{self._cluster}/dependencies_graph_{self._cluster}.png")
@@ -122,7 +122,7 @@ def get_list(file):
 
 if __name__ == '__main__':
     
-    file = 'data/FantomV/cluster_4.txt'
+    file = 'data/FantomV/cluster_3.txt'
     cluster = file.split('/')[-1].split('.')[0]
     print(cluster)
     gene_list = get_list(file)
