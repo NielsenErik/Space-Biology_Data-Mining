@@ -207,7 +207,6 @@ if __name__ == '__main__':
     mask = [col for col in prot_df.columns if 'Mmus_' in col]
     
     # apply log tranformation on protein data
-    
     for cols in mask:
         print(prot_df[cols].mean(), prot_df[cols].std())
         # sns.histplot(prot_df[cols])
@@ -219,6 +218,13 @@ if __name__ == '__main__':
         # sns.histplot(prot_df[cols])
         # plt.show()
         # plt.close()
+
+    # mask = [col for col in rna_df.columns if 'Mmus_' in col]
+    # for cols in mask:
+    #     sns.histplot(rna_df[cols], log_scale=True)
+    #     plt.show()
+    #     plt.close()
+
     save = prot_df.to_csv('data/proteins/ProtonDiscoverer/normalized_Proto_all_log.csv', index=False)
     
     integrator = DataIntegrator(rna_df, prot_df, mapper)

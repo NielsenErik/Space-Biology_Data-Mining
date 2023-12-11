@@ -1,5 +1,5 @@
-Number of edges: 181
-Number of nodes: 183
-Graph density: 0.010868912508256771
+Number of edges: 0
+Number of nodes: 10
+Graph density: 0
 Graph average clustering: 0.0
-Graph average degree connectivity: {27: 1.0, 1: 135.05524861878453, 154: 1.0}
+Graph average degree connectivity: {0: 0}

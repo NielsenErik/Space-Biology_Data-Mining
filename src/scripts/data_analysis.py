@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import math
 from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -72,32 +73,34 @@ class DataAnalyzer():
         plt.title(f'Missing values on sample\n{sample}')
         plt.savefig(f'figures/plots/rna-prot_means/missing_values_{sample}.png')
         plt.close()
-        
+
         df = df.replace([np.inf, -np.inf], np.nan)
         df = df.dropna()
         df = df.drop_duplicates(keep = 'first')
         
-        ois = IsolationForest(random_state=0).fit(df[['RNA-Seq', 'Proteomics']])
-        df['outlier'] = ois.predict(df[['RNA-Seq', 'Proteomics']])
+        # ois = IsolationForest(random_state=0).fit(df[['RNA-Seq', 'Proteomics']])
+        # df['outlier'] = ois.predict(df[['RNA-Seq', 'Proteomics']])
+        #
+        # clr = df['outlier'].map({1: 'blue', -1: 'red'})
+        # plt.scatter(df['RNA-Seq'], df['Proteomics'], c=clr, s=2)
+        # plt.xscale('log')
+        # plt.title(f'Outliers on sample\n{sample}')
+        # plt.xlabel('RNA-Seq')
+        # plt.ylabel('Proteomics')
+        # plt.savefig(f'figures/plots/rna-prot_means/outliers_{sample}.png')
+        # plt.close()
+        #
+        # df = df[df['outlier'] == 1]
         
-        clr = df['outlier'].map({1: 'blue', -1: 'red'})
-        plt.scatter(df['RNA-Seq'], df['Proteomics'], c=clr)
-        plt.title(f'Outliers on sample\n{sample}')
-        plt.xlabel('RNA-Seq')
-        plt.ylabel('Proteomics')
-        plt.savefig(f'figures/plots/rna-prot_means/outliers_{sample}.png')
-        plt.close()
-        
-        df = df[df['outlier'] == 1]
-        
-        plt.scatter(df['RNA-Seq'], df['Proteomics'])
-        plt.title(f'Outliers removed on sample\n{sample}')
+        plt.scatter(df['RNA-Seq'], df['Proteomics'], s=2)
+        plt.xscale('log')
+        plt.title(f'scatterplot sample\n{sample}')
         plt.xlabel('RNA-Seq')
         plt.ylabel('Proteomics')
         plt.savefig(f'figures/plots/rna-prot_means/outliers_removed_{sample}.png')
         plt.close()
         
-        df = df.drop(['outlier'], axis=1)
+        # df = df.drop(['outlier'], axis=1)
         return df
     
     def student_t_test_on_rna_prot_means(self):
@@ -145,11 +148,11 @@ class DataAnalyzer():
         sns.histplot(x = cols[0], data=df)
         plt.title(f'{title} t-test statistic distribution')
         plt.savefig(f'figures/plots/t-test/{title}_t-test_statistic_distribution.png')
-        plt.show()
+        # plt.show()
         sns.histplot(x = cols[1], data=df)
         plt.title(f'{title} t-test p-value distribution')
         plt.savefig(f'figures/plots/t-test/{title}_t-test_p-value_distribution.png')
-        plt.show()
+        # plt.show()
     
     def cluster_eval(self, df, title):
         if title == 'RNA-Seq':
@@ -173,8 +176,9 @@ class DataAnalyzer():
         ax[1].set_xlabel('Number of clusters')
         ax[1].set_ylabel('Silhouette score')
         ax[1].set_title(f'Silhouette score for {title}')
-        plt.savefig(f'figures/plots/clusters_analysis/{title}_cluster_eval.png')
-        plt.show()
+        plt.savefig(f'figures/plots/clusters_analysis/{title}_cluster_eval_w_outliers.png')
+        # plt.show()
+        plt.close()
     
     def cluster_analysis(self, df, title):
         df_ = df.drop(['mouse_ensembl_gene_id'], axis=1)
@@ -194,14 +198,16 @@ class DataAnalyzer():
         
         kmeans = KMeans(n_clusters=5, random_state=0).fit(df_)
         df['cluster'] = kmeans.labels_
-        
-        
-        
+
         sns.scatterplot(x=x, y=y, hue='cluster', data=df)
+        if title=='RNA-Seq':
+            plt.xscale('log')
+            plt.yscale('log')
         plt.title(f'evaluating number of clusters')
-        plt.savefig(f'figures/plots/clusters_analysis/{title}_clusters.png')
-        plt.show()
-        
+        plt.savefig(f'figures/plots/clusters_analysis/{title}_clusters_w_outliers.png')
+        # plt.show()
+        plt.close()
+
         print(f'Silhouette score: {silhouette_score(df_, kmeans.labels_)}')
         
         return df
@@ -217,8 +223,7 @@ class DataAnalyzer():
         gc_prot_cols.append('mouse_ensembl_gene_id')
         flt_rna_cols.append('mouse_ensembl_gene_id')
         flt_prot_cols.append('mouse_ensembl_gene_id')
-        
-                
+
         for cols in self._gc_df.columns.tolist():
             if '_rna' in cols and cols != 'STD_rna':
                 gc_rna_cols.append(cols)
@@ -240,12 +245,12 @@ class DataAnalyzer():
         
         sns.heatmap(rna_merge.isnull(), cbar=False, cmap='viridis', xticklabels=False)
         plt.title(f'Missing values on sample\nRNA-Seq both GC and FLT')
-        plt.show()
+        # plt.show()
         plt.close()
         
         sns.heatmap(prot_merge.isnull(), cbar=False, cmap='viridis', xticklabels=False)
         plt.title(f'Missing values on sample\nProteomics both GC and FLT')
-        plt.show()
+        # plt.show()
         plt.close()
         
         rna_merge = rna_merge.dropna()
@@ -280,10 +285,10 @@ class DataAnalyzer():
         for cluster in df['cluster_rna'].unique():
             
             cluster_df = df[df['cluster_rna'] == cluster]
-            tmp = cluster_df.sort_values(by=['rna-t-test-p-value'], ascending=False)
+            tmp = df.sort_values(by=['rna-t-test-p-value'], ascending=False)
             
             with open(f'data/FantomV/cluster_{cluster}.txt', 'w') as f:
-                for row in range(10):
+                for row in range(100):
                     if len(tmp)>row:
                         f.write(tmp.iloc[row][0] + '\n')
                     else:
@@ -304,18 +309,23 @@ class DataAnalyzer():
         self._prot_df = self._prot_df.rename(columns = {'cluster' : 'cluster_prot'})
         
         merged_df = pd.merge(self._rna_df, self._prot_df, on=['hgnc_symbol','mouse_ensembl_gene_id'], how='inner')
-        
-        genes_pool = merged_df[merged_df['cluster_rna'] == merged_df['cluster_prot']]
+        print(merged_df)
+        genes_pool = merged_df[((merged_df['cluster_rna'] == 1) & (merged_df['cluster_prot'] == 1)) |
+                               ((merged_df['cluster_rna'] == 3) & (merged_df['cluster_prot'] == 2))]
         print(genes_pool)
-        
+
+        # with open(f'data/FantomV/outliers.txt',
+        #           'w') as f:
+        #     for row in genes_pool.index:
+        #         f.write(genes_pool['hgnc_symbol'][row] + '\n')
+
         self.genes_picker(genes_pool)
         
         return self._gc_df, self._flt_df
-    
+
+
 if __name__ == '__main__':
-    
-    
-    
+
     df = pd.read_csv('data/integrated/integrated_data_all.csv')
     analyzer = DataAnalyzer(df)
     gc_df, flt_df = analyzer.run()

@@ -1,0 +1,5 @@
+Number of edges: 25
+Number of nodes: 51
+Graph density: 0.0196078431372549
+Graph average clustering: 0.0
+Graph average degree connectivity: {1: 2.357142857142857, 4: 2.25, 0: 0, 2: 2.0, 3: 2.1666666666666665}
